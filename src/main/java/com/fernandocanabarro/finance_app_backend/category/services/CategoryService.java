@@ -1,0 +1,16 @@
+package com.fernandocanabarro.finance_app_backend.category.services;
+
+import org.springframework.data.domain.Page;
+
+import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryRequestDto;
+import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryResponseDto;
+
+import reactor.core.publisher.Mono;
+
+public interface CategoryService {
+    Mono<Page<CategoryResponseDto>> findAll(String page, String size, String sort, String direction);
+    Mono<CategoryResponseDto> findById(Long id);
+    Mono<CategoryResponseDto> create(CategoryRequestDto dto);
+    Mono<CategoryResponseDto> update(Long id, CategoryRequestDto dto);
+    Mono<Void> delete(Long id);
+}
