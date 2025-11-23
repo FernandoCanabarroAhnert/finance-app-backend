@@ -11,7 +11,7 @@ public class CategoryMapper {
     }
 
     public static Category toEntity(CategoryRequestDto dto) {
-        return new Category(null, dto.getName(), dto.getColor());
+        return new Category(null, dto.getName(), dto.getColor(), null);
     }
 
 }

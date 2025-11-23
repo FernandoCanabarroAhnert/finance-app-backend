@@ -1,6 +1,7 @@
 package com.fernandocanabarro.finance_app_backend.category.entities;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import lombok.AllArgsConstructor;
@@ -18,4 +19,6 @@ public class Category {
     private Long id;
     private String name;
     private String color;
+    @Column("user_id")
+    private String userId;
 }
