@@ -1,0 +1,28 @@
+CREATE TABLE categories (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    color VARCHAR(7) NOT NULL,
+	user_id VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE wallets (
+	id BIGSERIAL PRIMARY KEY,
+	user_id VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    color VARCHAR(7) NOT NULL,
+	balance NUMERIC(12,2) NOT NULL,
+	last_income NUMERIC(12,2) NOT NULL, 
+	last_expense NUMERIC(12,2) NOT NULL, 
+	created_at DATE NOT NULL
+);
+
+CREATE TABLE transactions (
+	id BIGSERIAL PRIMARY KEY,
+	wallet_id BIGINT NOT NULL,
+	category_id BIGINT NOT NULL,
+	user_id VARCHAR(255) NOT NULL,
+	type VARCHAR(7) NOT NULL,
+	description VARCHAR(255) NOT NULL,
+	amount NUMERIC(12,2) NOT NULL,
+	date DATE NOT NULL
+);

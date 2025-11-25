@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryRequestDto;
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryResponseDto;
@@ -30,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final AuthService authService;
 
     @Override
+    @Transactional(readOnly = true)
     public Mono<Page<CategoryResponseDto>> findAll(String page, String size, String sort, String direction) {
         return withUserId(userId -> {
                 Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
@@ -50,6 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Mono<CategoryResponseDto> findById(Long id) {
         return withUserId(userId -> {
             return this.categoryRepository.findById(id)
@@ -61,6 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public Mono<CategoryResponseDto> create(CategoryRequestDto dto) {
         return withUserId(userId -> {
                 Category category = CategoryMapper.toEntity(dto);
@@ -71,6 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public Mono<CategoryResponseDto> update(Long id, CategoryRequestDto dto) {
         return withUserId(userId -> {
                 return this.categoryRepository.findById(id)
@@ -87,6 +92,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> delete(Long id) {
         return withUserId(userId -> {
             return this.categoryRepository.findById(id)
@@ -97,8 +103,8 @@ public class CategoryServiceImpl implements CategoryService {
         });
     }
 
-    private <T> Mono<T> withUserId(Function<String, Mono<T>> fn) {
-        return authService.getCurrentUserId().flatMap(fn);
+    private <T> Mono<T> withUserId(Function<String, Mono<T>> function) {
+        return authService.getCurrentUserId().flatMap(function);
     }
 
 }
