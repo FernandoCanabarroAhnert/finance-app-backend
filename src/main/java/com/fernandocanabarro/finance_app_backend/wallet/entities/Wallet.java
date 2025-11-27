@@ -26,10 +26,6 @@ public class Wallet {
     private String name;
     private String color;
     private BigDecimal balance;
-    @Column("last_income")
-    private BigDecimal lastIncome;
-    @Column("last_expense")
-    private BigDecimal lastExpense;
     @Column("created_at")
     private LocalDate createdAt;
 

@@ -57,7 +57,7 @@ public class WalletServiceImpl implements WalletService {
     public Mono<WalletResponseDto> findById(Long id) {
         return withUserId(userId -> {
             return this.walletRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("wallet with id " + id + " not found")))
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Wallet with id " + id + " not found")))
                 .filter(wallet -> wallet.getUserId().equals(userId))
                 .switchIfEmpty(Mono.error(() -> new ForbiddenException("You do not have permission to access this wallet")))
                 .map(WalletMapper::toDto);
@@ -80,7 +80,7 @@ public class WalletServiceImpl implements WalletService {
     public Mono<WalletResponseDto> update(Long id, WalletUpdateDto dto) {
         return withUserId(userId -> {
                 return this.walletRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("wallet with id " + id + " not found")))
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Wallet with id " + id + " not found")))
                 .filter(wallet -> wallet.getUserId().equals(userId))
                 .switchIfEmpty(Mono.error(() -> new ForbiddenException("You do not have permission to update this wallet")))
                 .flatMap(existingWallet -> {
@@ -97,7 +97,7 @@ public class WalletServiceImpl implements WalletService {
     public Mono<Void> delete(Long id) {
         return withUserId(userId -> {
             return this.walletRepository.findById(id)
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("wallet with id " + id + " not found")))
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Wallet with id " + id + " not found")))
                 .filter(wallet -> wallet.getUserId().equals(userId))
                 .switchIfEmpty(Mono.error(() -> new ForbiddenException("You do not have permission to delete this wallet")))
                 .flatMap(existingWallet -> this.walletRepository.delete(existingWallet));

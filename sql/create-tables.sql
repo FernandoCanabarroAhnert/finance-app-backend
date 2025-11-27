@@ -11,8 +11,6 @@ CREATE TABLE wallets (
     name VARCHAR(255) NOT NULL,
     color VARCHAR(7) NOT NULL,
 	balance NUMERIC(12,2) NOT NULL,
-	last_income NUMERIC(12,2) NOT NULL, 
-	last_expense NUMERIC(12,2) NOT NULL, 
 	created_at DATE NOT NULL
 );
 
@@ -24,5 +22,7 @@ CREATE TABLE transactions (
 	type VARCHAR(7) NOT NULL,
 	description VARCHAR(255) NOT NULL,
 	amount NUMERIC(12,2) NOT NULL,
-	date DATE NOT NULL
+	date TIMESTAMP NOT NULL,
+	FOREIGN KEY (wallet_id) REFERENCES wallets (id),
+	FOREIGN KEY (category_id) REFERENCES categories (id)
 );

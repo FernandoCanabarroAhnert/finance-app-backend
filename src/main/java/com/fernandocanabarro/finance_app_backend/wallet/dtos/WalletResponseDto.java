@@ -18,6 +18,4 @@ public class WalletResponseDto {
     String color;
     BigDecimal balance;
     LocalDate createdAt;
-    BigDecimal lastIncome;
-    BigDecimal lastExpense;
 }

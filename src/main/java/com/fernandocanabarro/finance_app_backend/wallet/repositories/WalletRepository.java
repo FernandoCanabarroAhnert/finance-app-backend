@@ -1,6 +1,5 @@
 package com.fernandocanabarro.finance_app_backend.wallet.repositories;
 
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
