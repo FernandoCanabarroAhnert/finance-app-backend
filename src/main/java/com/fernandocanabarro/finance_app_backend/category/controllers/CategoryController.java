@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryRequestDto;
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryResponseDto;
 import com.fernandocanabarro.finance_app_backend.category.services.CategoryService;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -60,6 +62,11 @@ public class CategoryController {
     public Mono<ResponseEntity<Void>> delete(@PathVariable Long id) {
         return this.categoryService.delete(id)
             .thenReturn(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/report")
+    public Flux<ReportDto> getCategoryReport() {
+        return this.categoryService.getCategoryReport();
     }
 
 }

@@ -16,11 +16,13 @@ import com.fernandocanabarro.finance_app_backend.category.entities.Category;
 import com.fernandocanabarro.finance_app_backend.category.mappers.CategoryMapper;
 import com.fernandocanabarro.finance_app_backend.category.repositories.CategoryRepository;
 import com.fernandocanabarro.finance_app_backend.category.services.CategoryService;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.ForbiddenException;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.NotFoundException;
 import com.fernandocanabarro.finance_app_backend.shared.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -103,8 +105,18 @@ public class CategoryServiceImpl implements CategoryService {
         });
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Flux<ReportDto> getCategoryReport() {
+        return withUserIdFlux(userId -> this.categoryRepository.getCategoryReport(userId));
+    }
+
     private <T> Mono<T> withUserId(Function<String, Mono<T>> function) {
         return authService.getCurrentUserId().flatMap(function);
+    }
+
+    private <T> Flux<T> withUserIdFlux(Function<String, Flux<T>> function) {
+        return authService.getCurrentUserId().flatMapMany(function);
     }
 
 }

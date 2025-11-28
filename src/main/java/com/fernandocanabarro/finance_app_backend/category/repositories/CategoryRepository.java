@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface CategoryRepository extends ReactiveCrudRepository<Category, Long> {
+public interface CategoryRepository extends ReactiveCrudRepository<Category, Long>, CategoryReportRepository {
     Flux<Category> findByUserId(String userId, Pageable pageable);
     Mono<Long> countByUserId(String userId);
 }

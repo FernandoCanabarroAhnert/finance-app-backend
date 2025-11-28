@@ -37,6 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final CategoryRepository categoryRepository;
     
     @Override
+    @Transactional(readOnly = true)
     public Mono<Page<TransactionResponseDto>> findAll(String page, String size, String sort, String direction) {
         return withUserId(userId -> {
             Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
@@ -55,6 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Mono<TransactionResponseDto> findById(Long id) {
         return withUserId(userId -> {
             return this.transactionRepository.findById(id)
@@ -66,6 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Mono<TransactionResponseDto> create(TransactionRequestDto dto) {
         return withUserId(userId -> {
             return Mono.zip(this.walletRepository.existsById(dto.getWalletId()), this.categoryRepository.existsById(dto.getCategoryId()))
@@ -155,6 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> delete(Long id) {
         return withUserId(userId -> {
             return this.transactionRepository.findById(id)

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletRequestDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletResponseDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletUpdateDto;
@@ -19,6 +20,7 @@ import com.fernandocanabarro.finance_app_backend.wallet.services.WalletService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -61,6 +63,11 @@ public class WalletController {
     public Mono<ResponseEntity<Void>> delete(@PathVariable Long id) {
         return this.walletService.delete(id)
             .thenReturn(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/report")
+    public Flux<ReportDto> getWalletReport() {
+        return this.walletService.getWalletReport();
     }
 
 }

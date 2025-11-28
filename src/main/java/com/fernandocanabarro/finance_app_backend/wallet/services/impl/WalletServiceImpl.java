@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fernandocanabarro.finance_app_backend.wallet.entities.Wallet;
 import com.fernandocanabarro.finance_app_backend.wallet.mappers.WalletMapper;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.ForbiddenException;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.NotFoundException;
 import com.fernandocanabarro.finance_app_backend.shared.services.AuthService;
@@ -22,6 +23,7 @@ import com.fernandocanabarro.finance_app_backend.wallet.repositories.WalletRepos
 import com.fernandocanabarro.finance_app_backend.wallet.services.WalletService;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -104,8 +106,18 @@ public class WalletServiceImpl implements WalletService {
         });
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Flux<ReportDto> getWalletReport() {
+        return withUserIdFlux(userId -> this.walletRepository.getWalletReport(userId));
+    }
+
     private <T> Mono<T> withUserId(Function<String, Mono<T>> function) {
-        return this.authService.getCurrentUserId().flatMap(function);
+        return authService.getCurrentUserId().flatMap(function);
+    }
+
+    private <T> Flux<T> withUserIdFlux(Function<String, Flux<T>> function) {
+        return authService.getCurrentUserId().flatMapMany(function);
     }
 
 }
