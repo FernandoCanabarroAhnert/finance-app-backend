@@ -13,9 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WalletResponseDto {
-    Long id;
-    String name;
-    String color;
-    BigDecimal balance;
-    LocalDate createdAt;
+    private Long id;
+    private String name;
+    private String color;
+    private BigDecimal balance;
+    private LocalDate createdAt;
 }

@@ -1,5 +1,6 @@
 package com.fernandocanabarro.finance_app_backend.wallet.services.impl;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +17,9 @@ import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.ForbiddenException;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.NotFoundException;
 import com.fernandocanabarro.finance_app_backend.shared.services.AuthService;
+import com.fernandocanabarro.finance_app_backend.transaction.enums.TransactionType;
+import com.fernandocanabarro.finance_app_backend.transaction.repositories.TransactionRepository;
+import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletDetailResponseDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletRequestDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletResponseDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletUpdateDto;
@@ -31,6 +35,7 @@ import reactor.core.publisher.Mono;
 public class WalletServiceImpl implements WalletService {
     
     private final WalletRepository walletRepository;
+    private final TransactionRepository transactionRepository;
     private final AuthService authService;
 
     @Override
@@ -56,15 +61,32 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional(readOnly = true)
-    public Mono<WalletResponseDto> findById(Long id) {
+    public Mono<WalletDetailResponseDto> findById(Long id) {
         return withUserId(userId -> {
             return this.walletRepository.findById(id)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Wallet with id " + id + " not found")))
                 .filter(wallet -> wallet.getUserId().equals(userId))
                 .switchIfEmpty(Mono.error(() -> new ForbiddenException("You do not have permission to access this wallet")))
-                .map(WalletMapper::toDto);
+                .flatMap(wallet -> {
+                    return Mono.zip(
+                        this.transactionRepository
+                            .findWalletLastTransaction(TransactionType.INCOME.toString(), id)
+                            .map(Optional::of)
+                            .switchIfEmpty(Mono.just(Optional.empty())),
+                        this.transactionRepository
+                            .findWalletLastTransaction(TransactionType.EXPENSE.toString(), id)
+                            .map(Optional::of)
+                            .switchIfEmpty(Mono.just(Optional.empty()))
+                    ).map(tuple -> {
+                        return WalletMapper.toDetailDto(
+                            wallet, 
+                            tuple.getT1().orElse(null), 
+                            tuple.getT2().orElse(null)
+                        );
+                    });
+                });
         });
-    }
+    };
 
     @Override
     @Transactional

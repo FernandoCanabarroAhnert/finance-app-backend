@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
+import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletDetailResponseDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletRequestDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletResponseDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletUpdateDto;
@@ -42,7 +43,7 @@ public class WalletController {
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<WalletResponseDto>> findById(@PathVariable Long id) {
+    public Mono<ResponseEntity<WalletDetailResponseDto>> findById(@PathVariable Long id) {
         return this.walletService.findById(id)
             .map(ResponseEntity::ok);
     }
