@@ -26,6 +26,10 @@ public class Wallet {
     private String name;
     private String color;
     private BigDecimal balance;
+    @Column("total_income")
+    private BigDecimal totalIncome;
+    @Column("total_expense")
+    private BigDecimal totalExpense;
     @Column("created_at")
     private LocalDate createdAt;
 
@@ -35,6 +39,22 @@ public class Wallet {
 
     public void decreaseBalance(BigDecimal amount) {
         this.balance = this.balance.subtract(amount);
+    }
+
+    public void increaseTotalIncome(BigDecimal amount) {
+        this.totalIncome = this.totalIncome.add(amount);
+    }
+
+    public void decreaseTotalIncome(BigDecimal amount) {
+        this.totalIncome = this.totalIncome.subtract(amount);
+    }
+
+    public void increaseTotalExpense(BigDecimal amount) {
+        this.totalExpense = this.totalExpense.add(amount);
+    }
+
+    public void decreaseTotalExpense(BigDecimal amount) {
+        this.totalExpense = this.totalExpense.subtract(amount);
     }
 
 }

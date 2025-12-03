@@ -11,6 +11,8 @@ CREATE TABLE wallets (
     name VARCHAR(255) NOT NULL,
     color VARCHAR(7) NOT NULL,
 	balance NUMERIC(12,2) NOT NULL,
+	total_income NUMERIC(12,2) NOT NULL,
+	total_expense NUMERIC(12,2) NOT NULL,
 	created_at DATE NOT NULL
 );
 

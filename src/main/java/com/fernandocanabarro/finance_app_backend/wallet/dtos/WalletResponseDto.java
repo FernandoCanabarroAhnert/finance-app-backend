@@ -17,5 +17,7 @@ public class WalletResponseDto {
     private String name;
     private String color;
     private BigDecimal balance;
+    private BigDecimal totalIncome;
+    private BigDecimal totalExpense;
     private LocalDate createdAt;
 }

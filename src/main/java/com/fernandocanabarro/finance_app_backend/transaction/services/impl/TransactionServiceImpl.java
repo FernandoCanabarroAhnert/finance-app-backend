@@ -88,8 +88,10 @@ public class TransactionServiceImpl implements TransactionService {
                                     BigDecimal amount = transaction.getAmount();
                                     if (transaction.getType().equals(TransactionType.INCOME.toString())) {
                                         wallet.increaseBalance(amount);
+                                        wallet.increaseTotalIncome(amount);
                                     } else {
                                         wallet.decreaseBalance(amount);
+                                        wallet.increaseTotalExpense(amount);
                                     }
                                     return this.walletRepository.save(wallet)
                                         .thenReturn(transaction);
@@ -126,8 +128,10 @@ public class TransactionServiceImpl implements TransactionService {
                                 .flatMap(oldWallet -> {
                                     if (oldType.equals(TransactionType.INCOME.toString())) {
                                         oldWallet.decreaseBalance(oldAmount);
+                                        oldWallet.decreaseTotalIncome(oldAmount);
                                     } else {
                                         oldWallet.increaseBalance(oldAmount);
+                                        oldWallet.decreaseTotalExpense(oldAmount);
                                     }
                                     return this.walletRepository.save(oldWallet).then(Mono.empty());
                                 });
@@ -143,8 +147,10 @@ public class TransactionServiceImpl implements TransactionService {
                                             BigDecimal amount = updateTransaction.getAmount();
                                             if (updateTransaction.getType().equals(TransactionType.INCOME.toString())) {
                                                 wallet.increaseBalance(amount);
+                                                wallet.increaseTotalIncome(amount);
                                             } else {
                                                 wallet.decreaseBalance(amount);
+                                                wallet.increaseTotalExpense(amount);
                                             }
                                             return this.walletRepository.save(wallet)
                                                 .thenReturn(updateTransaction);
