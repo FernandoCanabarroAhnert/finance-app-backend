@@ -1,10 +1,12 @@
 package com.fernandocanabarro.finance_app_backend.category.repositories;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.fernandocanabarro.finance_app_backend.category.entities.Category;
+import com.fernandocanabarro.finance_app_backend.category.projections.CategorySelectProjection;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,4 +15,10 @@ import reactor.core.publisher.Mono;
 public interface CategoryRepository extends ReactiveCrudRepository<Category, Long>, CategoryReportRepository {
     Flux<Category> findByUserId(String userId, Pageable pageable);
     Mono<Long> countByUserId(String userId);
+    @Query(value = """
+        SELECT id, name
+        FROM categories
+        WHERE user_id = :userId        
+    """)
+    Flux<CategorySelectProjection> findCategorySelect(String userId);
 }

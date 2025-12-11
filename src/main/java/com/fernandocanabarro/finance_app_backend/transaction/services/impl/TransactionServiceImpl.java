@@ -15,6 +15,8 @@ import com.fernandocanabarro.finance_app_backend.category.repositories.CategoryR
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.ForbiddenException;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.NotFoundException;
 import com.fernandocanabarro.finance_app_backend.shared.services.AuthService;
+import com.fernandocanabarro.finance_app_backend.transaction.dtos.BalanceReportDto;
+import com.fernandocanabarro.finance_app_backend.transaction.dtos.MonthBalanceReportDto;
 import com.fernandocanabarro.finance_app_backend.transaction.dtos.TransactionRequestDto;
 import com.fernandocanabarro.finance_app_backend.transaction.dtos.TransactionResponseDto;
 import com.fernandocanabarro.finance_app_backend.transaction.entities.Transaction;
@@ -25,6 +27,7 @@ import com.fernandocanabarro.finance_app_backend.transaction.services.Transactio
 import com.fernandocanabarro.finance_app_backend.wallet.repositories.WalletRepository;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -140,6 +143,7 @@ public class TransactionServiceImpl implements TransactionService {
                             transaction.setCategoryId(dto.getCategoryId());
                             transaction.setAmount(dto.getAmount());
                             transaction.setType(TransactionType.valueOf(dto.getType()).toString());
+                            transaction.setDescription(dto.getDescription());
                             Mono<Transaction> update = this.transactionRepository.save(transaction)
                                 .flatMap(updateTransaction -> {
                                     return this.walletRepository.findById(updateTransaction.getWalletId())
@@ -175,9 +179,24 @@ public class TransactionServiceImpl implements TransactionService {
         });
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Mono<BalanceReportDto> getBalanceReport() {
+        return withUserId(userId -> this.transactionRepository.getBalanceReport(userId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Flux<MonthBalanceReportDto> getMonthlyBalanceReport() {
+        return withUserIdFlux(userId -> this.transactionRepository.getMonthlyBalanceReport(userId));
+    }
+
     private <T> Mono<T> withUserId(Function<String, Mono<T>> function) {
         return this.authService.getCurrentUserId().flatMap(function);
     }
 
+    private <T> Flux<T> withUserIdFlux(Function<String, Flux<T>> function) {
+        return authService.getCurrentUserId().flatMapMany(function);
+    }
 
 }

@@ -19,8 +19,9 @@ public class WalletReportRepositoryImpl implements WalletReportRepository {
 
     @Override
     public Flux<ReportDto> getWalletReport(String userId) {
-        return databaseClient.sql("""
+        return databaseClient.sql(""" 
                     SELECT id, name, color,
+                        (SELECT COUNT(*) FROM transactions t WHERE t.wallet_id = w.id) AS count,
                         ROUND(
                             (SELECT COUNT(*) FROM transactions t WHERE t.wallet_id = w.id)::numeric 
                             / (SELECT COUNT(*) FROM transactions)::numeric * 100,
@@ -28,12 +29,14 @@ public class WalletReportRepositoryImpl implements WalletReportRepository {
                         ) AS percentage
                     FROM wallets w
                     WHERE w.user_id = :userId
+                    AND (SELECT COUNT(*) FROM transactions t WHERE t.wallet_id = w.id) > 0
                 """)
                 .bind("userId", userId)
                 .map((row, meta) -> new ReportDto(
                         row.get("id", Long.class),
                         row.get("name", String.class),
                         row.get("color", String.class),
+                        row.get("count", Long.class),
                         row.get("percentage", BigDecimal.class)
                 ))
                 .all();

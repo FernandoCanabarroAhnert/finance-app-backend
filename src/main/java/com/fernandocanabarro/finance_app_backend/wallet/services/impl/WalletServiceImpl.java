@@ -3,17 +3,21 @@ package com.fernandocanabarro.finance_app_backend.wallet.services.impl;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fernandocanabarro.finance_app_backend.wallet.entities.Wallet;
 import com.fernandocanabarro.finance_app_backend.wallet.mappers.WalletMapper;
 import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.SelectDto;
+import com.fernandocanabarro.finance_app_backend.shared.exceptions.BadRequestException;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.ForbiddenException;
 import com.fernandocanabarro.finance_app_backend.shared.exceptions.NotFoundException;
 import com.fernandocanabarro.finance_app_backend.shared.services.AuthService;
@@ -117,14 +121,18 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public Mono<Void> delete(Long id) {
         return withUserId(userId -> {
             return this.walletRepository.findById(id)
                 .switchIfEmpty(Mono.error(() -> new NotFoundException("Wallet with id " + id + " not found")))
                 .filter(wallet -> wallet.getUserId().equals(userId))
                 .switchIfEmpty(Mono.error(() -> new ForbiddenException("You do not have permission to delete this wallet")))
-                .flatMap(existingWallet -> this.walletRepository.delete(existingWallet));
+                .flatMap(existingWallet -> this.walletRepository.delete(existingWallet)
+                    .onErrorMap(DataIntegrityViolationException.class, ex -> new BadRequestException(
+                        "Wallet can't be deleted while it is associated with transactions"
+                    ))
+                );
         });
     }
 
@@ -132,6 +140,11 @@ public class WalletServiceImpl implements WalletService {
     @Transactional(readOnly = true)
     public Flux<ReportDto> getWalletReport() {
         return withUserIdFlux(userId -> this.walletRepository.getWalletReport(userId));
+    }
+
+    @Override
+    public Flux<SelectDto> findWalletSelect() {
+        return withUserIdFlux(userId -> this.walletRepository.findWalletSelect(userId).map(proj -> new SelectDto(proj.getId(), proj.getName())));
     }
 
     private <T> Mono<T> withUserId(Function<String, Mono<T>> function) {

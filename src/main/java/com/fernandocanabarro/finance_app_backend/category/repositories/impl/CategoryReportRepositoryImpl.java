@@ -21,6 +21,7 @@ public class CategoryReportRepositoryImpl implements CategoryReportRepository {
     public Flux<ReportDto> getCategoryReport(String userId) {
         return databaseClient.sql("""
                     SELECT id, name, color,
+                        (SELECT COUNT(*) FROM transactions t WHERE t.category_id = c.id) AS count,
                         ROUND(
                             (SELECT COUNT(*) FROM transactions t WHERE t.category_id = c.id)::numeric 
                             / (SELECT COUNT(*) FROM transactions)::numeric * 100,
@@ -28,12 +29,14 @@ public class CategoryReportRepositoryImpl implements CategoryReportRepository {
                         ) AS percentage
                     FROM categories c
                     WHERE c.user_id = :userId
+                    AND (SELECT COUNT(*) FROM transactions t WHERE t.category_id = c.id) > 0
                 """)
                 .bind("userId", userId)
                 .map((row, meta) -> new ReportDto(
                         row.get("id", Long.class),
                         row.get("name", String.class),
                         row.get("color", String.class),
+                        row.get("count", Long.class),
                         row.get("percentage", BigDecimal.class)
                 ))
                 .all();

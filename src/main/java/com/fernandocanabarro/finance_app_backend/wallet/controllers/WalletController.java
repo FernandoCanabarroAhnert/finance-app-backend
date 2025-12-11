@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.SelectDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletDetailResponseDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletRequestDto;
 import com.fernandocanabarro.finance_app_backend.wallet.dtos.WalletResponseDto;
@@ -70,5 +71,11 @@ public class WalletController {
     public Flux<ReportDto> getWalletReport() {
         return this.walletService.getWalletReport();
     }
+
+    @GetMapping("/select")
+    public Flux<SelectDto> findWalletSelect() {
+        return this.walletService.findWalletSelect();
+    }
+    
 
 }

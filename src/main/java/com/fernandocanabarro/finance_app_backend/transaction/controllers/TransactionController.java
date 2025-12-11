@@ -12,12 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fernandocanabarro.finance_app_backend.transaction.dtos.BalanceReportDto;
+import com.fernandocanabarro.finance_app_backend.transaction.dtos.MonthBalanceReportDto;
 import com.fernandocanabarro.finance_app_backend.transaction.dtos.TransactionRequestDto;
 import com.fernandocanabarro.finance_app_backend.transaction.dtos.TransactionResponseDto;
 import com.fernandocanabarro.finance_app_backend.transaction.services.TransactionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -60,6 +63,17 @@ public class TransactionController {
     public Mono<ResponseEntity<Void>> delete(@PathVariable Long id) {
         return this.transactionService.delete(id)
             .thenReturn(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/balance-report")
+    public Mono<ResponseEntity<BalanceReportDto>> getBalanceReport() {
+        return this.transactionService.getBalanceReport()
+            .map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/monthly-report")
+    public Flux<MonthBalanceReportDto> getMonthlyBalanceReport() {
+        return this.transactionService.getMonthlyBalanceReport();
     }
 
 }

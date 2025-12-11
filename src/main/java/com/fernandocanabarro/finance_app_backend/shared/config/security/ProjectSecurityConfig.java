@@ -23,6 +23,7 @@ public class ProjectSecurityConfig {
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeExchange(auth -> {
                     auth.pathMatchers("/actuator/health/**").permitAll();
                     auth.pathMatchers("/webjars/swagger-ui/**").permitAll();

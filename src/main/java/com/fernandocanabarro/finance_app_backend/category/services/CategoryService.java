@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryRequestDto;
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryResponseDto;
 import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.SelectDto;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,4 +17,5 @@ public interface CategoryService {
     Mono<CategoryResponseDto> update(Long id, CategoryRequestDto dto);
     Mono<Void> delete(Long id);
     Flux<ReportDto> getCategoryReport();
+    Flux<SelectDto> findCategorySelect();
 }

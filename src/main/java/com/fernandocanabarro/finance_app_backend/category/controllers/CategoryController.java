@@ -16,6 +16,7 @@ import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryRequestDt
 import com.fernandocanabarro.finance_app_backend.category.dtos.CategoryResponseDto;
 import com.fernandocanabarro.finance_app_backend.category.services.CategoryService;
 import com.fernandocanabarro.finance_app_backend.shared.dtos.ReportDto;
+import com.fernandocanabarro.finance_app_backend.shared.dtos.SelectDto;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,11 @@ public class CategoryController {
     @GetMapping("/report")
     public Flux<ReportDto> getCategoryReport() {
         return this.categoryService.getCategoryReport();
+    }
+
+    @GetMapping("/select")
+    public Flux<SelectDto> findCategorySelect() {
+        return this.categoryService.findCategorySelect();
     }
 
 }

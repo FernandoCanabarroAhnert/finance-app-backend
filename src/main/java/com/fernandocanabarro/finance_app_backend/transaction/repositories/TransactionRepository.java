@@ -9,7 +9,7 @@ import com.fernandocanabarro.finance_app_backend.transaction.entities.Transactio
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface TransactionRepository extends ReactiveCrudRepository<Transaction, Long> {
+public interface TransactionRepository extends ReactiveCrudRepository<Transaction, Long>, TransactionReportRepository {
     Flux<Transaction> findByUserId(String userId, Pageable pageable);
     Mono<Long> countByUserId(String userId);
     @Query(value = """
