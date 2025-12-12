@@ -1,0 +1,102 @@
+version: "3.7"
+services:
+  finance-app-backend:
+    image: fernandocanabarroahnert/finance-app-backend:latest
+    container_name: finance-app-backend
+    environment:
+      DATABASE_URL: r2dbc:postgresql://pg-docker:5433/finance-app
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: 1234567
+      JWK_SET_URI: http://keycloak:8180/realms/finance-app/protocol/openid-connect/certs
+      ISSUER_URI: http://keycloak:8180/realms/finance-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - pg-docker
+      - keycloak
+    networks:
+      - dev-network
+  finance-app-frontend:
+    image: fernandocanabarroahnert/finance-app-frontend:latest
+    container_name: finance-app-frontend
+    environment:
+      VITE_KEYCLOAK_URL: http://keycloak:8180
+      VITE_KEYCLOAK_REALM: finance-app
+      VITE_KEYCLOAK_CLIENT: finance-ui
+      VITE_API_URL: http://finance-app-backend:8080/api/v1
+    ports:
+      - "80:80"
+    depends_on:
+      - finance-app-backend
+    networks:
+      - dev-network
+  # ====================================================================================================================
+  # POSTGRES SERVER
+  # ====================================================================================================================
+  pg-docker:
+    image: postgres:14-alpine
+    container_name: dev-postgresql
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: 1234567
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dev-network
+
+  # ======================================================================================================================
+  # MYSQL FOR KEYCLOAK
+  # ======================================================================================================================
+  keycloak-mysql:
+    container_name: keycloak-mysql
+    image: mysql:8
+    ports:
+      - "3307:3306"
+    volumes:
+      - keycloak_mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    networks:
+      - dev-network
+  # ======================================================================================================================
+  # KEYCLOAK
+  # ======================================================================================================================
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:25.0.2
+    command: start-dev --import-realm
+    restart: always
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: keycloak-mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data/import/
+    depends_on:
+      - keycloak-mysql
+    networks:
+      - dev-network
+
+# ======================================================================================================================
+# NETWORK
+# ======================================================================================================================
+networks:
+  dev-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  keycloak_mysql_data:
+  keycloak_data:
