@@ -10,20 +10,26 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+
+import lombok.RequiredArgsConstructor;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @Configuration
+@RequiredArgsConstructor
 public class ProjectSecurityConfig {
 
+    private final CorsConfigurationSource corsConfigurationSource;
+
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
-    String jwkSetUri;
+    private String jwkSetUri;
 
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeExchange(auth -> {
                     auth.pathMatchers("/actuator/health/**").permitAll();
                     auth.pathMatchers("/webjars/swagger-ui/**").permitAll();
