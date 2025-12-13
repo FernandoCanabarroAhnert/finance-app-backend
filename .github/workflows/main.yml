@@ -39,13 +39,13 @@ jobs:
                     ${{ secrets.DOCKER_HUB_USERNAME }}/finance-app-backend:latest
                     ${{ secrets.DOCKER_HUB_USERNAME }}/finance-app-backend:${{ github.run_id }}
 
-    # deploy:
-    #     needs: build
-    #     runs-on: self-hosted
-    #     steps:
-    #         - name: Update application image on VM
-    #           run: |
-    #             cd /root
-    #             sudo docker compose pull finance-app-backend
-    #             sudo docker compose rm -fs finance-app-backend
-    #             sudo docker compose up -d finance-app-backend
+    deploy:
+        needs: build
+        runs-on: self-hosted
+        steps:
+            - name: Update application image on VM
+              run: |
+                cd /home/azureuser/app
+                sudo docker compose pull finance-app-backend
+                sudo docker compose rm -fs finance-app-backend
+                sudo docker compose up -d finance-app-backend
